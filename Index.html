@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESS Quiz</title>
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#4facfe,#00f2fe);
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+.quiz-container{
+    background:white;
+    width:600px;
+    max-width:95%;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+button{
+    background:#4facfe;
+    border:none;
+    padding:10px 15px;
+    margin-top:15px;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+}
+button:hover{
+    background:#00c6fb;
+}
+.option{
+    display:block;
+    margin:8px 0;
+    width:100%;
+}
+#score{
+    font-size:24px;
+    text-align:center;
+}
+</style>
+</head>
+<body><div class="quiz-container">
+    <h2 id="question">Loading questions...</h2>
+    <div id="options"></div>
+    <button onclick="nextQuestion()">Next</button>
+    <h3 id="score"></h3>
+</div><script>
+let quiz=[];
+let current=0;
+let score=0;
+
+// 🔥 FETCH QUESTIONS FROM questions.json (Put this file in same GitHub folder)
+async function loadQuiz(){
+    const response = await fetch('questions.json');
+    quiz = await response.json();
+    loadQuestion();
+}
+
+function loadQuestion(){
+    const q=quiz[current];
+    document.getElementById("question").innerText=`${current+1}. ${q.q}`;
+    const optionsDiv=document.getElementById("options");
+    optionsDiv.innerHTML="";
+
+    q.options.forEach(option=>{
+        const btn=document.createElement("button");
+        btn.innerText=option;
+        btn.classList.add("option");
+        btn.onclick=()=>selectAnswer(option);
+        optionsDiv.appendChild(btn);
+    });
+}
+
+function selectAnswer(option){
+    if(option===quiz[current].answer){
+        score++;
+    }
+    nextQuestion();
+}
+
+function nextQuestion(){
+    current++;
+    if(current<quiz.length){
+        loadQuestion();
+    }else{
+        document.querySelector(".quiz-container").innerHTML=`<div id="score">Your Score: ${score} / ${quiz.length}<br><br><button onclick='location.reload()'>Restart</button></div>`;
+    }
+}
+
+loadQuiz();
+</script></body>
+</html>
